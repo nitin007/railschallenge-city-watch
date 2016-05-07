@@ -1,4 +1,4 @@
 class Emergency < ActiveRecord::Base
-  validates_numericality_of :fire_severity, :medical_severity, :police_severity, greater_than_or_equal_to: 0
-  validates_uniqueness_of :code
+  validates :code, presence: true, uniqueness: true
+  validates :fire_severity, :police_severity, :medical_severity, presence: true, numericality: { greater_than_or_equal_to: 0 }
 end
