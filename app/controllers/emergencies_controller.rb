@@ -25,7 +25,7 @@ class EmergenciesController < ApplicationController
 
   def create
     if @emergency.save
-      render json: { emergency: @emergency }, status: 201
+      render json: { emergency: { responders: @emergency.responders, full_response: Emergency.with_full_response }.merge(@emergency.as_json) }, status: 201
     else
       render json: { message: @emergency.errors.to_hash }, status: 422
     end
@@ -44,7 +44,7 @@ class EmergenciesController < ApplicationController
     end
 
     def create_params
-      params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity, :resolved_at)
+      params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity)
     end
 
     def patch_params
