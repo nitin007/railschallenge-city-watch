@@ -1,11 +1,11 @@
 class EmergenciesController < ApplicationController
-  before_filter :render_not_found, except: [:create, :index, :show]
+  before_filter :render_not_found, only: [:new, :edit, :destroy]
   before_filter :build_emergency, only: [:create]
   before_filter :fetch_emergency, only: [:show, :update]
 
   def index
     emergencies = Emergency.all
-    render json: { emergencies: emergencies, full_responses: [Emergency.full_response, Emergency.count] }
+    render json: { emergencies: emergencies, full_responses: [Emergency.on_full_response.size, Emergency.count] }
   end
 
   def new
@@ -20,9 +20,7 @@ class EmergenciesController < ApplicationController
   end
 
   def update
-    if @emergency.update(emergency_params)
-      render status: 200
-    end
+    render json: { emergency: @emergency } if @emergency.update(patch_params)
   end
 
   def create
@@ -45,12 +43,16 @@ class EmergenciesController < ApplicationController
       render json: {message: "page not found"}, status: 404
     end
 
-    def emergency_params
+    def create_params
       params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity, :resolved_at)
     end
 
+    def patch_params
+      params.require(:emergency).permit(:fire_severity, :police_severity, :medical_severity, :resolved_at)
+    end
+
     def build_emergency
-      @emergency = Emergency.new(emergency_params)
+      @emergency = Emergency.new(create_params)
     end
 
     def fetch_emergency

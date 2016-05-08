@@ -5,4 +5,8 @@ class Emergency < ActiveRecord::Base
   def to_param
     code.parameterize
   end
+
+  def self.on_full_response
+    []
+  end
 end
