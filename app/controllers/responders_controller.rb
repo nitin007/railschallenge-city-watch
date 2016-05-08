@@ -1,6 +1,6 @@
 class RespondersController < ApplicationController
   before_filter :render_not_found, only: [:new, :edit, :destroy]
-  before_filter :build_emergency, only: [:create]
+  before_filter :build_responder, only: [:create]
   before_filter :fetch_responder, only: [:show, :update]
 
   def index
@@ -19,12 +19,12 @@ class RespondersController < ApplicationController
     if @responder
       render json: { responder: @responder.as_json(only: [:emergency_code, :type, :name, :capacity, :on_duty]) }
     else
-      render nothing: true, status: :not_found
+      render nothing: true, status: 404
     end
   end
 
   def update
-    render json: { responder: @responder } if @responder.update(responder_params)
+    render json: { responder: @responder } if @responder.update(patch_params)
   end
 
   def create
@@ -36,14 +36,6 @@ class RespondersController < ApplicationController
   end
 
   def edit
-  end
-
-  def update
-    responder = Responder.find_by(name: params[:id])
-
-    if responder.update(responder_params)
-      render status: 200
-    end
   end
 
   def destroy
@@ -59,7 +51,11 @@ class RespondersController < ApplicationController
       params.require(:responder).permit(:type, :name, :capacity)
     end
 
-    def build_emergency
+    def patch_params
+      params.require(:responder).permit(:on_duty)
+    end
+
+    def build_responder
       @responder = Responder.new(responder_params)
     end
 
