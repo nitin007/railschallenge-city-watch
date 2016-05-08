@@ -5,7 +5,7 @@ class EmergenciesController < ApplicationController
 
   def index
     emergencies = Emergency.all
-    render json: { emergencies: emergencies, full_responses: [Emergency.on_full_response.size, Emergency.count] }
+    render json: { emergencies: emergencies, full_responses: [Emergency.with_full_response.size, Emergency.count] }
   end
 
   def new
