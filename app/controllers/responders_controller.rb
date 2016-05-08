@@ -25,6 +25,14 @@ class RespondersController < ApplicationController
   def edit
   end
 
+  def update
+    responder = Responder.find_by(name: params[:id])
+
+    if responder.update(responder_params)
+      render status: 200
+    end
+  end
+
   def destroy
   end
 

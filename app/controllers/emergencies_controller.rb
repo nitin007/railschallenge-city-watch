@@ -1,17 +1,28 @@
 class EmergenciesController < ApplicationController
-  before_filter :render_not_found, except: [:create, :index]
+  before_filter :render_not_found, except: [:create, :index, :show]
   before_filter :build_emergency, only: [:create]
+  before_filter :fetch_emergency, only: [:show, :update]
 
   def index
     emergencies = Emergency.all
-    render json: { emergencies: emergencies }
+    render json: { emergencies: emergencies, full_responses: [Emergency.full_response, Emergency.count] }
   end
 
   def new
   end
 
+  def show
+    if @emergency
+      render json: { emergency: @emergency }
+    else
+      render nothing: true, status: 404
+    end
+  end
+
   def update
-    
+    if @emergency.update(emergency_params)
+      render status: 200
+    end
   end
 
   def create
@@ -35,10 +46,14 @@ class EmergenciesController < ApplicationController
     end
 
     def emergency_params
-      params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity)
+      params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity, :resolved_at)
     end
 
     def build_emergency
       @emergency = Emergency.new(emergency_params)
+    end
+
+    def fetch_emergency
+      @emergency = Emergency.find_by(code: params[:id])
     end
 end
